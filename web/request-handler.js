@@ -8,14 +8,37 @@ var types = [
 var actions = {
   'GET' : function(res, path) {
     // index.html or loading.html
-    if ( path === '/index.html' || path === '/loading.html' ) {
-      helpers.serveAssets(res, path);
-      helpers.sendResponse(res, 200, '', headers);
+    if ( path === helpers.CLIENT_ROOT_DIR + '/index.html' || path === helpers.CLIENT_ROOT_DIR + '/loading.html' ) {
+      helpers.serveAssets(res, path, 200, '', helpers.headers);
     }
-    // archives
+    // else if path = '/loading.html'
+      // submit response
+        // payload = loading.html
+        // response code = 200
+    // else if path is within archives
+      // serve site
+    // else
+      // 404
+
   },
   'POST' : function(res, path) {
-
+    // if path !exists in sites.txt
+      // write to sites.txt
+      // submit response
+        // payload = 'thank you'
+        // response code = 200
+    // else
+      // if exists in archives/sites
+        // read from archives/sites
+        // submit response
+          // payload = empty
+          // response code = 302
+          // headers['location'] = /site
+      // else
+        // submit response
+          // payload = empty
+          // response code = 302
+          // headers['location'] = /loading.html
   }
 };
 
@@ -28,7 +51,7 @@ exports.handleRequest = function (req, res, path) {
     actions[req.method](res, path);
   }
   else {
-    helpers.sendResponse(res, 404, 'NOT FOUND', headers);
+    helpers.sendResponse(res, 404, 'NOT FOUND', helpers.headers);
   }
   
   
