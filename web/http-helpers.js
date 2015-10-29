@@ -14,7 +14,16 @@ exports.serveAssets = function(res, asset, callback) {
   // Write some code here that helps serve up your static files!
   // (Static files are things like html (yours or archived from others...),
   // css, or anything that doesn't change often.)
+  fs.readFile(asset, function(err, data) {
+    res.data(data);
+  });
+  
 };
+
+exports.sendResponse = function(res, statusCode, payLoad, headers){
+  res.writeHead(statusCode, headers);
+  res.end(payLoad);
+}
 
   // Write some code here that helps serve up your static files!
   // (Static files are things like html (yours or archived from others...),
