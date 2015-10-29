@@ -34,23 +34,25 @@ var actions = {
 
   },
   'POST' : function(res, pathname) {
-    // if path !exists in sites.txt
-      // write to sites.txt
-      // submit response
-        // payload = 'thank you'
-        // response code = 200
-    // else
-      // if exists in archives/sites
-        // read from archives/sites
-        // submit response
-          // payload = empty
-          // response code = 302
-          // headers['location'] = /site
-      // else
-        // submit response
-          // payload = empty
-          // response code = 302
-          // headers['location'] = /loading.html
+
+    archive.isUrlInList(pathname, function(exists) {
+      if ( !exists ) {
+        archive.addUrlToList(pathname);
+        helpers.sendResponse(res, 200, 'thanks!', helpers.headers);
+      } else {
+        archive.isUrlArchived(pathname, function(exists) {
+          if ( exists ) {
+            helpers.headers['Location'] = pathname; //may have to remove first '/'
+            helpers.serveAssets(res, helpers.ARCHIVE_ROOT_DIR + pathname, 302, '', helpers.headers);
+          } else {
+            helpers.headers['Location'] = '/loading.html'; //may have to add server name
+            helpers.sendResponse(res, 302, '', helpers.headers);
+          }
+        })
+      }
+
+    });
+
   }
 };
 

@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
+var helpers = require('../public/http-helpers');
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -28,13 +29,38 @@ exports.initialize = function(pathsObj) {
 exports.readListOfUrls = function() {
 };
 
-exports.isUrlInList = function() {
+exports.isUrlInList = function(path, callback) {
+  var fileLocation = helpers.ARCHIVE_ROOT_DIR + '/sites.txt';
+  var exists = false;
+
+  fs.readFile(fileLocation, 'utf8', function(err, data) {
+    if ( data.split("\n").indexOf(path) !== -1 ) {
+      exists = true;
+      if ( callback ) {
+        callback(exists);
+      }
+    }
+  });
 };
 
-exports.addUrlToList = function() {
+exports.addUrlToList = function(url) {
+  fs.appendFile(helpers.ARCHIVE_ROOT_DIR + '/sites.txt', url);
 };
 
-exports.isUrlArchived = function() {
+exports.isUrlArchived = function(path, callback) {
+  var directory = helpers.ARCHIVE_ROOT_DIR;
+  var exists = false;
+  fs.readdir(directory, function(err, files) {
+
+    if ( files.indexOf(path) !== -1 ) {
+      exists = true;
+
+      if (callback) {
+        callback(exists);
+      }
+    }
+  });
+
 };
 
 exports.downloadUrls = function() {
