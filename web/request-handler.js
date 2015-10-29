@@ -18,20 +18,21 @@ var clientPaths = [
 
 var actions = {
   'GET' : function(req, res, pathname) {
-    console.log('>>>' + pathname);
     
     if( pathname === '/') {
       pathname = clientPaths[0];
     }
     if( clientPaths.indexOf(pathname) !== -1 ){
       helpers.serveAssets(res, helpers.CLIENT_ROOT_DIR + pathname, 200, '', helpers.headers);
-    } else if ( archive.isUrlArchived(pathname.slice(1)) ){ //NEED TO PUT IN CALLBACK
-      helpers.serveAssets(res, helpers.ARCHIVE_ROOT_DIR + '/sites' + pathname, 200, '', helpers.headers);
     } else {
-      console.log('THIS IS OUR 404');
-      helpers.sendResponse(res, 404, 'NOTFOUND', helpers.headers);
+      archive.isUrlArchived(pathname.slice(1), function(exists) { 
+        if ( exists ) {
+          helpers.serveAssets(res, helpers.ARCHIVE_ROOT_DIR + '/sites' + pathname, 200, '', helpers.headers);
+        } else {
+          helpers.sendResponse(res, 404, 'NOTFOUND', helpers.headers);
+        }
+      });
     }
-
   },
   'POST' : function(req, res, pathname) {
 
@@ -49,14 +50,12 @@ var actions = {
 
       archive.isUrlInList(payLoad, function(exists){
         if( !exists ){
-            //console.log(payLoad + ' doesnt exist');
           archive.addUrlToList(payLoad);
           helpers.sendResponse(res, 200, 'thanks', helpers.headers);
         } else {
-            //console.log(payLoad + ' exists')
           archive.isUrlArchived(payLoad, function(exists){
             if( exists ){
-              helpers.headers['Location'] = 'hotmail.com';
+              helpers.headers['Location'] = payLoad;
               helpers.serveAssets(res, helpers.ARCHIVE_ROOT_DIR + '/sites/' + payLoad, 302, '', helpers.headers);
             } else {
               helpers.headers['Location'] = '/loading.html';
@@ -66,37 +65,6 @@ var actions = {
         };
       });
     }
-
-
-
-
-
-    // archive.isUrlInList(pathname, function(exists) {
-    //   if ( !exists ) {
-    //     console.log(pathname);
-    //     var payLoad = '';
-    //     req.on('data', function(chunk) {
-    //       payLoad += chunk;
-    //     });
-    //     req.on('end', function() {
-    //       archive.addUrlToList(payLoad);
-    //       helpers.sendResponse(res, 200, 'thanks!', helpers.headers);
-    //     });
-
-    //   } else {
-    //     archive.isUrlArchived(pathname, function(exists) {
-    //       if ( exists ) {
-    //         helpers.headers['Location'] = pathname; //may have to remove first '/'
-    //         helpers.serveAssets(res, helpers.ARCHIVE_ROOT_DIR + pathname, 302, '', helpers.headers);
-    //       } else {
-    //         helpers.headers['Location'] = '/loading.html'; //may have to add server name
-    //         helpers.sendResponse(res, 302, '', helpers.headers);
-    //       }
-    //     })
-    //   }
-
-    // });
-
   }
 };
 
@@ -105,6 +73,9 @@ exports.handleRequest = function (req, res, pathname) {
 
   if ( path.extname(pathname) in contentTypes ) {
     helpers.headers['Content-Type'] = contentTypes[path.extname(pathname)];
+  }
+  else {
+   helpers.headers['Content-Type'] = contentTypes['.html']; 
   }
   if ( req.method in actions ) {
     actions[req.method](req, res, pathname);

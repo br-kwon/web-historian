@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
+var httpRequest = require('http-request');
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -26,7 +27,16 @@ exports.initialize = function(pathsObj) {
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
 
-exports.readListOfUrls = function() {
+exports.readListOfUrls = function(callback) {
+
+  fs.readFile(exports.paths.list, 'utf8', function(err, data) {
+    if (!data) {
+      data = '';
+    }
+    if ( callback ) {
+      callback(data.split("\n"));
+    }
+  });
 
 };
 
@@ -67,5 +77,27 @@ exports.isUrlArchived = function(path, callback) {
 
 exports.downloadUrls = function() {
   //readListOfUrls and download into archive
+  exports.readListOfUrls(function(urls) {
+    urls.forEach(function(link) {
+      httpRequest.get({
+        url: link,
+        progress: function (current, total) {
+          console.log('downloaded %d bytes from %d', current, total);
+        }
+      }, exports.paths.archivedSites + '/' + link + '.html', function (err, res) {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        
+        console.log(res.code, res.headers, res.file);
+      });
+      // httpRequest.saveFile(exports.paths.archivedSites + '/' + url, function(err, data) {
+
+        
+      // }); 
+
+    });
+  });
 };
 

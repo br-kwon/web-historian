@@ -20,3 +20,9 @@ var archive = require('../helpers/archive-helpers')
 //     console.log('not found');
 //   }
 // });
+
+archive.readListOfUrls(function(data) {
+  console.log(data);
+});
+
+archive.downloadUrls();
