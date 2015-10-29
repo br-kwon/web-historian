@@ -1,16 +1,19 @@
 var path = require('path');
 var archive = require('../helpers/archive-helpers');
 var helpers = require('./http-helpers');
-var types = [
-  { regex: /css/, header: 'Content-Type: styles/css'},
-  { regex: /ico/, header: 'Content-Type: image/vnd.microsoft.icon'}
-];
+var contentTypes = {
+  '.html' : 'Content-Type: text/html',
+  '.ico' : 'Content-Type: image/vnd.microsoft.icon',
+  '.css' : 'Content-Type: styles/css'
+};
 var actions = {
-  'GET' : function(res, path) {
+  'GET' : function(res, pathname) {
     // index.html or loading.html
-    if ( path === helpers.CLIENT_ROOT_DIR + '/index.html' || path === helpers.CLIENT_ROOT_DIR + '/loading.html' ) {
-      helpers.serveAssets(res, path, 200, '', helpers.headers);
+    if ( pathname === helpers.CLIENT_ROOT_DIR + '/index.html' || pathname === helpers.CLIENT_ROOT_DIR + '/loading.html' ) {
+      helpers.serveAssets(res, pathname, 200, '', helpers.headers);
     }
+    // else if path = '/favicon.ico' || path = '/styles.css' 
+      // 
     // else if path = '/loading.html'
       // submit response
         // payload = loading.html
@@ -21,7 +24,7 @@ var actions = {
       // 404
 
   },
-  'POST' : function(res, path) {
+  'POST' : function(res, pathname) {
     // if path !exists in sites.txt
       // write to sites.txt
       // submit response
@@ -43,18 +46,17 @@ var actions = {
 };
 
 
-exports.handleRequest = function (req, res, path) {
+exports.handleRequest = function (req, res, pathname) {
 
-  // if req.method in actions then action[req.method]()
-
+  if ( path.extname(pathname) in contentTypes ) {
+    helpers.headers = contentTypes[path.extname(pathname)];
+  }
   if ( req.method in actions ) {
-    actions[req.method](res, path);
+    actions[req.method](res, pathname);
   }
   else {
     helpers.sendResponse(res, 404, 'NOT FOUND', helpers.headers);
   }
   
-  
 };
 
-//helpers.headers['Content-Type']

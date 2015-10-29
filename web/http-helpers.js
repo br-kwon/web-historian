@@ -17,7 +17,6 @@ exports.serveAssets = function(res, asset, statusCode, payLoad, headers) {
   // (Static files are things like html (yours or archived from others...),
   // css, or anything that doesn't change often.)
   fs.readFile(asset, 'utf8', function(err, data) {
-    console.log('>>>serveAssets');
     res.writeHead(statusCode, headers);
     res.write(data);
     res.end();
@@ -26,7 +25,6 @@ exports.serveAssets = function(res, asset, statusCode, payLoad, headers) {
 };
 
 exports.sendResponse = function(res, statusCode, payLoad, headers){
-  console.log('>>>sendResponse');
   res.writeHead(statusCode, headers);
   res.end(payLoad);
 }
