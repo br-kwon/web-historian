@@ -13,8 +13,9 @@ initialize("./archives");
 var port = 8080;
 var ip = "127.0.0.1";
 var server = http.createServer( function(req,res) {
+  console.log('Received ' + req.method + ' from ' + req.url);
   var path = url.parse(req.url).pathname;
-  handler.handleRequest(req,res, helpers.CLIENT_ROOT_DIR + path + 'index.html');
+  handler.handleRequest(req,res, path);
 });
 
 if (module.parent) {

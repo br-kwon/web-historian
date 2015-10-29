@@ -18,7 +18,9 @@ exports.serveAssets = function(res, asset, statusCode, payLoad, headers) {
   // css, or anything that doesn't change often.)
   fs.readFile(asset, 'utf8', function(err, data) {
     res.writeHead(statusCode, headers);
-    res.write(data);
+    console.log(asset);
+    console.log(data);
+    console.log(res.write(data));
     res.end();
   });
   

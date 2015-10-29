@@ -4,24 +4,33 @@ var helpers = require('./http-helpers');
 var contentTypes = {
   '.html' : 'Content-Type: text/html',
   '.ico' : 'Content-Type: image/vnd.microsoft.icon',
-  '.css' : 'Content-Type: styles/css'
+  '.css' : 'text/css'
 };
+
+var clientPaths = [
+  '/index.html',
+  '/loading.html',
+  '/favicon.ico',
+  '/styles.css'
+];
+
+//clientPaths = clientPaths.map( function(path) { return helpers.CLIENT_ROOT_DIR + path } );
+
 var actions = {
   'GET' : function(res, pathname) {
-    // index.html or loading.html
-    if ( pathname === helpers.CLIENT_ROOT_DIR + '/index.html' || pathname === helpers.CLIENT_ROOT_DIR + '/loading.html' ) {
-      helpers.serveAssets(res, pathname, 200, '', helpers.headers);
+
+    if( pathname === '/') {
+      console.log('>>> path is /')
+      pathname = clientPaths[0];
     }
-    // else if path = '/favicon.ico' || path = '/styles.css' 
-      // 
-    // else if path = '/loading.html'
-      // submit response
-        // payload = loading.html
-        // response code = 200
-    // else if path is within archives
-      // serve site
-    // else
-      // 404
+    if( clientPaths.indexOf(pathname) !== -1 ){
+      console.log('>>> entered other clientpaths')
+      helpers.serveAssets(res, helpers.CLIENT_ROOT_DIR + pathname, 200, '', helpers.headers);
+    } else if ( archive.isUrlArchived(pathname) ){
+      helpers.serveAssets(res, helpers.ARCHIVE_ROOT_DIR + pathname, 200, '', helpers.headers);
+    } else {
+      helpers.sendResponse(res, 404, 'NOTFOUND', helpers.headers);
+    }
 
   },
   'POST' : function(res, pathname) {
@@ -49,7 +58,7 @@ var actions = {
 exports.handleRequest = function (req, res, pathname) {
 
   if ( path.extname(pathname) in contentTypes ) {
-    helpers.headers = contentTypes[path.extname(pathname)];
+    helpers.headers['Content-Type'] = contentTypes[path.extname(pathname)];
   }
   if ( req.method in actions ) {
     actions[req.method](res, pathname);
