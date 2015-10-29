@@ -1,7 +1,6 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
-var helpers = require('../public/http-helpers');
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -9,6 +8,7 @@ var helpers = require('../public/http-helpers');
  * if you move any files, you'll only need to change your code in one place! Feel free to
  * customize it in any way you wish.
  */
+
 
 exports.paths = {
   siteAssets: path.join(__dirname, '../web/public'),
@@ -27,41 +27,45 @@ exports.initialize = function(pathsObj) {
 // modularize your code. Keep it clean!
 
 exports.readListOfUrls = function() {
+
 };
 
 exports.isUrlInList = function(path, callback) {
-  var fileLocation = helpers.ARCHIVE_ROOT_DIR + '/sites.txt';
   var exists = false;
 
-  fs.readFile(fileLocation, 'utf8', function(err, data) {
+  fs.readFile(exports.paths.list, 'utf8', function(err, data) {
+    if (!data) {
+      data = '';
+    }
     if ( data.split("\n").indexOf(path) !== -1 ) {
       exists = true;
-      if ( callback ) {
-        callback(exists);
-      }
+    }
+    if ( callback ) {
+      callback(exists);
     }
   });
 };
 
 exports.addUrlToList = function(url) {
-  fs.appendFile(helpers.ARCHIVE_ROOT_DIR + '/sites.txt', url);
+  fs.appendFile(exports.paths.list, "\n" + url);
 };
 
 exports.isUrlArchived = function(path, callback) {
-  var directory = helpers.ARCHIVE_ROOT_DIR;
+  console.log('>>> isUrlArchived' + path);
   var exists = false;
-  fs.readdir(directory, function(err, files) {
+  fs.readdir(exports.paths.archivedSites, function(err, files) {
 
     if ( files.indexOf(path) !== -1 ) {
       exists = true;
-
-      if (callback) {
-        callback(exists);
-      }
+    }
+    if (callback) {
+      callback(exists);
     }
   });
 
 };
 
 exports.downloadUrls = function() {
+  //readListOfUrls and download into archive
 };
+
