@@ -1,21 +1,30 @@
 var fs = require('fs');
 var path = require('path');
+// var _ = require('/Users/student/2015-10-web-historian/node_modules/underscore');
+// var httpRequest = require('/Users/student/2015-10-web-historian/node_modules/http-request');
+
 var _ = require('underscore');
 var httpRequest = require('http-request');
 
-/*
- * You will need to reuse the same paths many times over in the course of this sprint.
- * Consider using the `paths` object below to store frequently used file paths. This way,
- * if you move any files, you'll only need to change your code in one place! Feel free to
- * customize it in any way you wish.
- */
+// ABSOLUTE PATH
+var mainDir = '/Users/student/2015-10-web-historian/';
 
 
+// RELATIVE PATH NAMES
 exports.paths = {
   siteAssets: path.join(__dirname, '../web/public'),
+  archives: path.join(__dirname, '../archives'),
   archivedSites: path.join(__dirname, '../archives/sites'),
   list: path.join(__dirname, '../archives/sites.txt')
 };
+
+// ABSOLUTE PATH NAMES
+// exports.paths = {
+//   siteAssets: mainDir + 'web/public',
+//   archives: mainDir + 'archives',
+//   archivedSites: mainDir + 'archives/sites',
+//   list: mainDir + 'archives/sites.txt'
+// };
 
 // Used for stubbing paths for tests, do not modify
 exports.initialize = function(pathsObj) {
@@ -75,29 +84,38 @@ exports.isUrlArchived = function(path, callback) {
 
 };
 
-exports.downloadUrls = function() {
-  //readListOfUrls and download into archive
-  exports.readListOfUrls(function(urls) {
-    urls.forEach(function(link) {
-      httpRequest.get({
-        url: link,
-        progress: function (current, total) {
-          console.log('downloaded %d bytes from %d', current, total);
-        }
-      }, exports.paths.archivedSites + '/' + link + '.html', function (err, res) {
-        if (err) {
-          console.error(err);
-          return;
-        }
-        
-        console.log(res.code, res.headers, res.file);
-      });
-      // httpRequest.saveFile(exports.paths.archivedSites + '/' + url, function(err, data) {
-
-        
-      // }); 
-
-    });
+exports.downloadUrl = function(link, callback) {
+  httpRequest.get({
+    url: link,
+    progress: function (current, total) {
+      console.log('downloaded %d bytes from %d', current, total);
+    }
+  }, exports.paths.archivedSites + '/' + link + '.html', function (err, res) {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    if (callback) {
+      callback();
+    }
+    console.log(res.code, res.headers, res.file);
   });
-};
+
+}
+
+// exports.downloadUrls = function(callback) {
+//   //readListOfUrls and download into archive
+  
+
+//   exports.readListOfUrls(function(urls) {
+//     urls.forEach(function(link) {
+//       exports.downloadUrl(link, function() {
+//         count++;
+//         if ( count > /*the number of urls that we're downloading*/ ) {
+//           callback();
+//         }
+//       });
+//     });
+//   });
+// };
 

@@ -48,22 +48,40 @@ var actions = {
 
     var payLoadHandler = function(){
 
-      archive.isUrlInList(payLoad, function(exists){
-        if( !exists ){
-          archive.addUrlToList(payLoad);
-          helpers.sendResponse(res, 200, 'thanks', helpers.headers);
+      archive.isUrlArchived(payLoad, function(exists){
+        if ( exists ){
+          helpers.headers['Location'] = payLoad;
+          helpers.serveAssets(res, helpers.ARCHIVE_ROOT_DIR + '/sites/' + payLoad, 302, '', helpers.headers);
         } else {
-          archive.isUrlArchived(payLoad, function(exists){
-            if( exists ){
-              helpers.headers['Location'] = payLoad;
-              helpers.serveAssets(res, helpers.ARCHIVE_ROOT_DIR + '/sites/' + payLoad, 302, '', helpers.headers);
-            } else {
+          archive.isUrlInList(payLoad, function(exists){
+            if ( exists ){
               helpers.headers['Location'] = '/loading.html';
               helpers.sendResponse(res, 302, '', helpers.headers);
-             }
-          })
-        };
+            } else {
+              archive.addUrlToList(payLoad);
+              helpers.sendResponse(res, 200, 'thanks', helpers.headers);
+            }
+          });
+        }
       });
+
+
+      // archive.isUrlInList(payLoad, function(exists){
+      //   if( !exists ){
+      //     archive.addUrlToList(payLoad);
+      //     helpers.sendResponse(res, 200, 'thanks', helpers.headers);
+      //   } else {
+      //     archive.isUrlArchived(payLoad, function(exists){
+      //       if( exists ){
+      //         helpers.headers['Location'] = payLoad;
+      //         helpers.serveAssets(res, helpers.ARCHIVE_ROOT_DIR + '/sites/' + payLoad, 302, '', helpers.headers);
+      //       } else {
+      //         helpers.headers['Location'] = '/loading.html';
+      //         helpers.sendResponse(res, 302, '', helpers.headers);
+      //        }
+      //     })
+      //   };
+      // });
     }
   }
 };

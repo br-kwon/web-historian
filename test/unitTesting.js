@@ -21,8 +21,8 @@ var archive = require('../helpers/archive-helpers')
 //   }
 // });
 
-archive.readListOfUrls(function(data) {
-  console.log(data);
-});
+// archive.readListOfUrls(function(data) {
+//   console.log(data);
+// });
 
-archive.downloadUrls();
+// archive.downloadUrls();

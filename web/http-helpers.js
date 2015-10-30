@@ -15,9 +15,6 @@ exports.headers = headers = {
 };
 
 exports.serveAssets = function(res, asset, statusCode, payLoad, headers) {
-  // Write some code here that helps serve up your static files!
-  // (Static files are things like html (yours or archived from others...),
-  // css, or anything that doesn't change often.)
   console.log('>>>' + asset);
   fs.readFile(asset, 'utf8', function(err, data) {
     console.log(data);
@@ -33,8 +30,3 @@ exports.sendResponse = function(res, statusCode, payLoad, headers){
   res.end(payLoad);
 }
 
-  // Write some code here that helps serve up your static files!
-  // (Static files are things like html (yours or archived from others...),
-  // css, or anything that doesn't change often.)
-
-// As you progress, keep thinking about what helper functions you can put here!
